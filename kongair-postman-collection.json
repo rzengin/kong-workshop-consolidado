@@ -1,0 +1,101 @@
+{
+  "info": {
+    "name": "KongAir Workshop API",
+    "description": "Colección de Postman para probar el ejercicio final de consolidación en la instancia local de Docker de Kong Gateway.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. GET /flights (App-External - Exitoso)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "apikey",
+            "value": "my-external-key",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8000/flights",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8000",
+          "path": [
+            "flights"
+          ]
+        },
+        "description": "Prueba exitosa. Consume la ruta `/flights` utilizando la key `my-external-key` (App-External). Este consumidor pertenece al grupo `external` de ACL, por lo que tiene acceso permitido."
+      },
+      "response": []
+    },
+    {
+      "name": "2. GET /flights (App-Internal - Denegado por ACL)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "apikey",
+            "value": "my-internal-key",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8000/flights",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8000",
+          "path": [
+            "flights"
+          ]
+        },
+        "description": "Prueba denegada. Consume la ruta `/flights` utilizando la key `my-internal-key` (App-Internal). Este consumidor NO pertenece al grupo `external`, por lo que Kong debería devolver un `403 Forbidden`."
+      },
+      "response": []
+    },
+    {
+      "name": "3. GET /flights (Sin API Key - No Autorizado)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8000/flights",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8000",
+          "path": [
+            "flights"
+          ]
+        },
+        "description": "Prueba sin autenticación. Al no enviar el header `apikey`, Kong debería devolver un `401 Unauthorized`."
+      },
+      "response": []
+    },
+    {
+      "name": "4. GET /get (HTTPBin - Transformaciones de Headers)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8000/get",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8000",
+          "path": [
+            "get"
+          ]
+        },
+        "description": "Prueba de transformaciones. Llama al endpoint libre `/get`. Revisa en la respuesta que el header `x-inter-env: lab` haya sido inyectado en el request por Kong hacia el upstream."
+      },
+      "response": []
+    }
+  ]
+}

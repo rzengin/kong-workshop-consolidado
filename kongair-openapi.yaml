@@ -1,0 +1,53 @@
+openapi: 3.0.0
+info:
+  title: KongAir API
+  description: Especificación de la API de KongAir para el ejercicio de consolidación del workshop.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8000
+    description: Kong API Gateway (Local)
+paths:
+  /flights:
+    get:
+      summary: Obtener vuelos
+      description: Retorna una lista de vuelos disponibles. Requiere autenticación con API Key y permisos del grupo 'external'.
+      security:
+        - ApiKeyAuth: []
+      responses:
+        '200':
+          description: Respuesta exitosa con datos de vuelos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    origin:
+                      type: string
+                    destination:
+                      type: string
+                    price:
+                      type: number
+        '401':
+          description: No autorizado (Falta API Key o es inválida)
+        '403':
+          description: Prohibido (El consumidor no pertenece al grupo de ACL requerido)
+        '429':
+          description: Demasiadas peticiones (Rate Limit excedido)
+  /get:
+    get:
+      summary: Endpoint de prueba (HTTPBin)
+      description: Endpoint utilizado para validar transformaciones de headers (Request Transformer).
+      responses:
+        '200':
+          description: Respuesta exitosa
+          
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: apikey

@@ -1,0 +1,16 @@
+_format_version: "3.0"
+
+services:
+  - name: customers
+    url: http://host.docker.internal:8081/anything/customers
+    routes:
+      - name: customers-route
+        paths:
+          - /customers
+
+  - name: bookings
+    url: http://host.docker.internal:8081/anything/bookings
+    routes:
+      - name: bookings-route
+        paths:
+          - /bookings

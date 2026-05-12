@@ -1,0 +1,40 @@
+_format_version: "3.0"
+
+plugins:
+  - name: opentelemetry
+    config:
+      traces_endpoint: http://host.docker.internal:4318/v1/traces
+      logs_endpoint: http://host.docker.internal:4318/v1/logs
+      resource_attributes:
+        service.name: kong-api-gateway
+
+
+services:
+  - name: flights
+    url: http://host.docker.internal:8081/anything/flights
+    plugins:
+      - name: key-auth
+        config:
+          key_names:
+            - apikey
+    routes:
+      - name: flights-route
+        paths:
+          - /flights
+        methods:
+          - GET
+
+  - name: routes
+    url: http://host.docker.internal:8081/anything/routes
+    routes:
+      - name: routes-route
+        paths:
+          - /routes
+
+consumers:
+  - username: App-External
+    keyauth_credentials:
+      - key: external-secret-123
+  - username: App-Internal
+    keyauth_credentials:
+      - key: internal-secret-123

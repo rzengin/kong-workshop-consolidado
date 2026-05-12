@@ -1,0 +1,9 @@
+_format_version: "3.0"
+plugins:
+  - name: opentelemetry
+    config:
+      traces_endpoint: http://host.docker.internal:4318/v1/traces
+      logs_endpoint: http://host.docker.internal:4318/v1/logs
+      resource_attributes:
+        service.name: kong-api-gateway
+
