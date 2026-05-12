@@ -11,6 +11,7 @@
 
 ## 📑 Índice de Contenidos
 
+- [Introducción](#introducción)
 - [A. Pre-requisitos y convención de puertos (10 min)](#a-pre-requisitos-y-convención-de-puertos-10-min)
   - [A.1 Pre-requisitos mínimos](#a1-pre-requisitos-mínimos)
   - [A.2 Variables para comandos (Ajustadas a tu entorno local)](#a2-variables-para-comandos-ajustadas-a-tu-entorno-local)
@@ -31,7 +32,16 @@
 - [B.14 Seguridad adicional: IP Restriction (5 min)](#b14-seguridad-adicional-ip-restriction-5-min)
 - [B.15 Observabilidad: Konnect Analytics Explorer (5 min)](#b15-observabilidad-konnect-analytics-explorer-5-min)
 
----
+## Introducción
+
+En este laboratorio integrador construiremos desde cero una plataforma API Gateway gestionada declarativamente (GitOps) con observabilidad avanzada.
+
+A lo largo del taller, emularemos un ecosistema distribuido donde:
+- **Konnect (SaaS)** actuará como nuestro panel de control centralizado, delegando la administración a distintos equipos de desarrollo (External e Internal) y a un equipo de Plataforma (Global).
+- **Data Planes Locales** procesarán el tráfico real, consumiendo APIs mock (vuelos, rutas, clientes, reservas).
+- **SigNoz (OpenTelemetry)** funcionará como nuestro pilar de observabilidad unificada, recibiendo trazas y logs directamente desde el gateway para validar el impacto de cada política de seguridad que apliquemos.
+
+El siguiente diagrama detalla la arquitectura que implementaremos:
 
 ```mermaid
 flowchart TB
