@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "KongAir Workshop API",
-    "description": "Colección de Postman para probar el ejercicio final de consolidación en la instancia local de Docker de Kong Gateway.",
+    "description": "Colecci\u00f3n de Postman para probar el ejercicio final de consolidaci\u00f3n en la instancia local de Docker de Kong Gateway.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -12,24 +12,50 @@
         "header": [
           {
             "key": "apikey",
-            "value": "my-external-key",
+            "value": "external-secret-123",
             "type": "text"
           }
         ],
         "url": {
-          "raw": "http://localhost:8000/flights",
+          "raw": "http://localhost:28000/flights",
           "protocol": "http",
           "host": [
             "localhost"
           ],
-          "port": "8000",
+          "port": "28000",
           "path": [
             "flights"
           ]
         },
-        "description": "Prueba exitosa. Consume la ruta `/flights` utilizando la key `my-external-key` (App-External). Este consumidor pertenece al grupo `external` de ACL, por lo que tiene acceso permitido."
+        "description": "Prueba exitosa. Consume la ruta `/flights` utilizando la key `external-secret-123` (App-External). Este consumidor pertenece al grupo `external` de ACL, por lo que tiene acceso permitido."
       },
-      "response": []
+      "response": [],
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "console.log('Iniciando request: App-External - Exitoso');",
+              "pm.environment.set('request_start_time', Date.now());"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "pm.test('Response time is less than 500ms', function () {",
+              "    pm.expect(pm.response.responseTime).to.be.below(500);",
+              "});"
+            ]
+          }
+        }
+      ]
     },
     {
       "name": "2. GET /flights (App-Internal - Denegado por ACL)",
@@ -38,24 +64,41 @@
         "header": [
           {
             "key": "apikey",
-            "value": "my-internal-key",
+            "value": "internal-secret-123",
             "type": "text"
           }
         ],
         "url": {
-          "raw": "http://localhost:8000/flights",
+          "raw": "http://localhost:28000/flights",
           "protocol": "http",
           "host": [
             "localhost"
           ],
-          "port": "8000",
+          "port": "28000",
           "path": [
             "flights"
           ]
         },
-        "description": "Prueba denegada. Consume la ruta `/flights` utilizando la key `my-internal-key` (App-Internal). Este consumidor NO pertenece al grupo `external`, por lo que Kong debería devolver un `403 Forbidden`."
+        "description": "Prueba denegada. Consume la ruta `/flights` utilizando la key `internal-secret-123` (App-Internal). Este consumidor NO pertenece al grupo `external`, por lo que Kong deber\u00eda devolver un `403 Forbidden`."
       },
-      "response": []
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 403 Forbidden', function () {",
+              "    pm.response.to.have.status(403);",
+              "});",
+              "pm.test('Error message is correct', function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.message).to.include('You cannot consume this service');",
+              "});"
+            ]
+          }
+        }
+      ]
     },
     {
       "name": "3. GET /flights (Sin API Key - No Autorizado)",
@@ -63,19 +106,32 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:8000/flights",
+          "raw": "http://localhost:28000/flights",
           "protocol": "http",
           "host": [
             "localhost"
           ],
-          "port": "8000",
+          "port": "28000",
           "path": [
             "flights"
           ]
         },
-        "description": "Prueba sin autenticación. Al no enviar el header `apikey`, Kong debería devolver un `401 Unauthorized`."
+        "description": "Prueba sin autenticaci\u00f3n. Al no enviar el header `apikey`, Kong deber\u00eda devolver un `401 Unauthorized`."
       },
-      "response": []
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 401 Unauthorized', function () {",
+              "    pm.response.to.have.status(401);",
+              "});"
+            ]
+          }
+        }
+      ]
     },
     {
       "name": "4. GET /get (HTTPBin - Transformaciones de Headers)",
@@ -83,19 +139,135 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:8000/get",
+          "raw": "http://localhost:28000/get",
           "protocol": "http",
           "host": [
             "localhost"
           ],
-          "port": "8000",
+          "port": "28000",
           "path": [
             "get"
           ]
         },
         "description": "Prueba de transformaciones. Llama al endpoint libre `/get`. Revisa en la respuesta que el header `x-inter-env: lab` haya sido inyectado en el request por Kong hacia el upstream."
       },
-      "response": []
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "pm.test('Header x-inter-env was injected', function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.headers['X-Inter-Env']).to.eql('lab');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. GET /routes (External - Libre)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:28000/routes",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "28000",
+          "path": [
+            "routes"
+          ]
+        },
+        "description": "Obtener la lista de rutas desde el Data Plane External."
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. GET /customers (Internal - Libre)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:18000/customers",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "18000",
+          "path": [
+            "customers"
+          ]
+        },
+        "description": "Obtener la lista de clientes desde el Data Plane Internal."
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. GET /bookings (Internal - Libre)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:18000/bookings",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "18000",
+          "path": [
+            "bookings"
+          ]
+        },
+        "description": "Obtener la lista de reservas desde el Data Plane Internal."
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});"
+            ]
+          }
+        }
+      ]
     }
   ]
 }

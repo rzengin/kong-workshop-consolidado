@@ -5,7 +5,7 @@ services:
     image: mccutchen/go-httpbin
     container_name: kongair-backend
     ports:
-      - "8081:8081"
+      - "9081:9081"
     environment:
-      - PORT=8081
+      - PORT=9081
     restart: unless-stopped

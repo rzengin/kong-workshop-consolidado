@@ -1,15 +1,16 @@
 _format_version: "3.0"
 
+
 services:
   - name: flights
-    url: http://host.docker.internal:8081/anything/flights
+    url: http://host.docker.internal:9081/anything/flights
     routes:
       - name: flights-route
         paths:
           - /flights
 
   - name: routes
-    url: http://host.docker.internal:8081/anything/routes
+    url: http://host.docker.internal:9081/anything/routes
     routes:
       - name: routes-route
         paths:

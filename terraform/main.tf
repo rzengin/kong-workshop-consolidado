@@ -4,7 +4,7 @@
 
 # 1. Control Plane External
 resource "konnect_gateway_control_plane" "kongair_external" {
-  name         = "KongAir_External"
+  name         = "${var.participant_prefix}_KongAir_External"
   description  = "Control Plane para tráfico externo de KongAir"
   cluster_type = "CLUSTER_TYPE_HYBRID"
   auth_type    = "pinned_client_certs"
@@ -12,7 +12,7 @@ resource "konnect_gateway_control_plane" "kongair_external" {
 
 # 2. Control Plane Internal
 resource "konnect_gateway_control_plane" "kongair_internal" {
-  name         = "KongAir_Internal"
+  name         = "${var.participant_prefix}_KongAir_Internal"
   description  = "Control Plane para tráfico interno de KongAir"
   cluster_type = "CLUSTER_TYPE_HYBRID"
   auth_type    = "pinned_client_certs"
@@ -20,7 +20,7 @@ resource "konnect_gateway_control_plane" "kongair_internal" {
 
 # 3. Control Plane Global (Repositorio de Estándares)
 resource "konnect_gateway_control_plane" "kongair_global" {
-  name         = "KongAir_Global"
+  name         = "${var.participant_prefix}_KongAir_Global"
   description  = "Control Plane Global como repositorio de estándares"
   cluster_type = "CLUSTER_TYPE_HYBRID"
   auth_type    = "pinned_client_certs"
@@ -33,12 +33,12 @@ resource "konnect_gateway_control_plane" "kongair_global" {
 
 # 1. Equipos (Teams)
 resource "konnect_team" "external_developers" {
-  name        = "External Developers"
+  name        = "${var.participant_prefix}_External_Developers"
   description = "Equipo a cargo del desarrollo y mantenimiento de APIs externas"
 }
 
 resource "konnect_team" "internal_developers" {
-  name        = "Internal Developers"
+  name        = "${var.participant_prefix}_Internal_Developers"
   description = "Equipo a cargo del desarrollo y mantenimiento de APIs internas"
 }
 

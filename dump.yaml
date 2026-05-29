@@ -1,0 +1,327 @@
+_format_version: "3.0"
+_konnect:
+  control_plane_name: rzengin_KongAir_External
+consumers:
+- acls:
+  - group: external
+  keyauth_credentials:
+  - key: my-external-key
+  plugins:
+  - config:
+      day: null
+      error_code: 429
+      error_message: API rate limit exceeded
+      fault_tolerant: true
+      header_name: null
+      hide_client_headers: false
+      hour: null
+      limit_by: consumer
+      minute: 20
+      month: null
+      path: null
+      policy: local
+      redis:
+        cloud_authentication: null
+        database: 0
+        host: null
+        password: null
+        port: 6379
+        server_name: null
+        ssl: false
+        ssl_verify: false
+        timeout: 2000
+        username: null
+      redis_database: 0
+      redis_host: null
+      redis_password: null
+      redis_port: 6379
+      redis_server_name: null
+      redis_ssl: false
+      redis_ssl_verify: false
+      redis_timeout: 2000
+      redis_username: null
+      second: null
+      sync_rate: -1
+      year: null
+    enabled: true
+    name: rate-limiting
+    protocols:
+    - grpc
+    - grpcs
+    - http
+    - https
+  username: App-External
+- acls:
+  - group: internal
+  keyauth_credentials:
+  - key: my-internal-key
+  plugins:
+  - config:
+      day: null
+      error_code: 429
+      error_message: API rate limit exceeded
+      fault_tolerant: true
+      header_name: null
+      hide_client_headers: false
+      hour: null
+      limit_by: consumer
+      minute: 3
+      month: null
+      path: null
+      policy: local
+      redis:
+        cloud_authentication: null
+        database: 0
+        host: null
+        password: null
+        port: 6379
+        server_name: null
+        ssl: false
+        ssl_verify: false
+        timeout: 2000
+        username: null
+      redis_database: 0
+      redis_host: null
+      redis_password: null
+      redis_port: 6379
+      redis_server_name: null
+      redis_ssl: false
+      redis_ssl_verify: false
+      redis_timeout: 2000
+      redis_username: null
+      second: null
+      sync_rate: -1
+      year: null
+    enabled: true
+    name: rate-limiting
+    protocols:
+    - grpc
+    - grpcs
+    - http
+    - https
+  username: App-Internal
+plugins:
+- config:
+    access_logs:
+      custom_attributes_by_lua: null
+      endpoint: http://signoz-otel-collector:4318/v1/logs
+    access_logs_endpoint: http://signoz-otel-collector:4318/v1/logs
+    batch_flush_delay: null
+    batch_span_count: null
+    connect_timeout: 1000
+    header_type: w3c
+    headers: null
+    http_response_header_for_traceid: null
+    logs_endpoint: http://signoz-otel-collector:4318/v1/logs
+    metrics:
+      enable_ai_metrics: false
+      enable_bandwidth_metrics: true
+      enable_consumer_attribute: false
+      enable_latency_metrics: true
+      enable_request_metrics: true
+      enable_upstream_health_metrics: false
+      endpoint: http://signoz-otel-collector:4318/v1/metrics
+      push_interval: 60
+    propagation:
+      clear: null
+      default_format: w3c
+      extract: null
+      inject: null
+    queue:
+      concurrency_limit: 1
+      initial_retry_delay: 0.01
+      max_batch_size: 200
+      max_bytes: null
+      max_coalescing_delay: 1
+      max_entries: 10000
+      max_retry_delay: 60
+      max_retry_time: 60
+    read_timeout: 5000
+    resource_attributes:
+      service.name: kong-api-gateway
+    sampling_rate: null
+    sampling_strategy: parent_drop_probability_fallback
+    send_timeout: 5000
+    traces_endpoint: http://signoz-otel-collector:4318/v1/traces
+  enabled: true
+  name: opentelemetry
+  protocols:
+  - grpc
+  - grpcs
+  - http
+  - https
+services:
+- connect_timeout: 60000
+  enabled: true
+  host: host.docker.internal
+  name: flights
+  path: /anything/flights
+  plugins:
+  - config:
+      allow:
+      - external
+      always_use_authenticated_groups: false
+      deny: null
+      hide_groups_header: false
+      include_consumer_groups: false
+    enabled: true
+    name: acl
+    protocols:
+    - grpc
+    - grpcs
+    - http
+    - https
+  - config:
+      echo_downstream: true
+      generator: uuid
+      header_name: x-correlation-id
+    enabled: true
+    name: correlation-id
+    protocols:
+    - grpc
+    - grpcs
+    - http
+    - https
+  - config:
+      anonymous: null
+      hide_credentials: false
+      identity_realms:
+      - id: null
+        region: null
+        scope: cp
+      key_in_body: false
+      key_in_header: true
+      key_in_query: true
+      key_names:
+      - apikey
+      realm: null
+      run_on_preflight: true
+    enabled: true
+    name: key-auth
+    protocols:
+    - grpc
+    - grpcs
+    - http
+    - https
+    - ws
+    - wss
+  port: 9081
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  routes:
+  - https_redirect_status_code: 426
+    methods:
+    - GET
+    name: flights-route
+    path_handling: v0
+    paths:
+    - /flights
+    plugins:
+    - config:
+        allow:
+        - 127.0.0.1
+        deny: null
+        message: null
+        status: null
+      enabled: true
+      name: ip-restriction
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+      - tcp
+      - tls
+    - config:
+        add:
+          headers:
+          - 'x-perceptiva: true'
+          json: []
+          json_types: []
+        append:
+          headers: []
+          json: []
+          json_types: []
+        remove:
+          headers:
+          - Via
+          json: []
+        rename:
+          headers: []
+          json: []
+        replace:
+          headers: []
+          json: []
+          json_types: []
+      enabled: true
+      name: response-transformer
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: true
+  write_timeout: 60000
+- connect_timeout: 60000
+  enabled: true
+  host: host.docker.internal
+  name: httpbin-service
+  port: 9081
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  routes:
+  - https_redirect_status_code: 426
+    name: httpbin-get
+    path_handling: v0
+    paths:
+    - /get
+    plugins:
+    - config:
+        add:
+          body: []
+          headers:
+          - 'x-inter-env: lab'
+          querystring: []
+        append:
+          body: []
+          headers: []
+          querystring: []
+        http_method: null
+        remove:
+          body: []
+          headers: []
+          querystring: []
+        rename:
+          body: []
+          headers: []
+          querystring: []
+        replace:
+          body: []
+          headers: []
+          querystring: []
+          uri: null
+      enabled: true
+      name: request-transformer
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: true
+  write_timeout: 60000

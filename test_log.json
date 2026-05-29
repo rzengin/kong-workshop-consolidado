@@ -1,0 +1,27 @@
+{
+ "resourceLogs": [
+  {
+   "resource": {
+    "attributes": [
+     {
+      "key": "service.name",
+      "value": {
+       "stringValue": "test-service"
+      }
+     }
+    ]
+   },
+   "scopeLogs": [
+    {
+     "logRecords": [
+      {
+       "body": {
+        "stringValue": "This is a test log message"
+       }
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

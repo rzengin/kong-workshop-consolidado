@@ -1,0 +1,31 @@
+_format_version: "3.0"
+plugins:
+- config:
+    access_logs:
+      endpoint: http://signoz-otel-collector:4318/v1/logs
+    access_logs_endpoint: http://signoz-otel-collector:4318/v1/logs
+    header_type: w3c
+    logs_endpoint: http://signoz-otel-collector:4318/v1/logs
+    metrics:
+      enable_bandwidth_metrics: true
+      enable_latency_metrics: true
+      enable_request_metrics: true
+      endpoint: http://signoz-otel-collector:4318/v1/metrics
+    resource_attributes:
+      deployment.environment: workshop
+      service.name: kong-api-gateway
+    traces_endpoint: http://signoz-otel-collector:4318/v1/traces
+  name: opentelemetry
+services:
+- name: customers
+  routes:
+  - name: customers-route
+    paths:
+    - /customers
+  url: http://host.docker.internal:9081/anything/customers
+- name: bookings
+  routes:
+  - name: bookings-route
+    paths:
+    - /bookings
+  url: http://host.docker.internal:9081/anything/bookings

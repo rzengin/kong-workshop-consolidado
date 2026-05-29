@@ -3,14 +3,28 @@ info:
   title: KongAir API
   description: Especificación de la API de KongAir para el ejercicio de consolidación del workshop.
   version: 1.0.0
+  contact:
+    name: Soporte KongAir
+    email: soporte@kongair.com
 servers:
-  - url: http://localhost:8000
-    description: Kong API Gateway (Local)
+  - url: http://localhost:28000
+    description: Kong API Gateway (External Data Plane)
+  - url: http://localhost:18000
+    description: Kong API Gateway (Internal Data Plane)
+tags:
+  - name: Flights
+  - name: Routes
+  - name: Customers
+  - name: Bookings
+  - name: Testing
 paths:
   /flights:
     get:
       summary: Obtener vuelos
       description: Retorna una lista de vuelos disponibles. Requiere autenticación con API Key y permisos del grupo 'external'.
+      operationId: getFlights
+      tags:
+        - Flights
       security:
         - ApiKeyAuth: []
       responses:
@@ -41,6 +55,39 @@ paths:
     get:
       summary: Endpoint de prueba (HTTPBin)
       description: Endpoint utilizado para validar transformaciones de headers (Request Transformer).
+      operationId: testGet
+      tags:
+        - Testing
+      responses:
+        '200':
+          description: Respuesta exitosa
+  /routes:
+    get:
+      summary: Obtener rutas
+      description: Retorna una lista de rutas disponibles. Endpoint público en Data Plane External.
+      operationId: getRoutes
+      tags:
+        - Routes
+      responses:
+        '200':
+          description: Respuesta exitosa
+  /customers:
+    get:
+      summary: Obtener clientes
+      description: Retorna una lista de clientes. Endpoint privado en Data Plane Internal.
+      operationId: getCustomers
+      tags:
+        - Customers
+      responses:
+        '200':
+          description: Respuesta exitosa
+  /bookings:
+    get:
+      summary: Obtener reservas
+      description: Retorna una lista de reservas. Endpoint privado en Data Plane Internal.
+      operationId: getBookings
+      tags:
+        - Bookings
       responses:
         '200':
           description: Respuesta exitosa

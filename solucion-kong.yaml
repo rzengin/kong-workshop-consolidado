@@ -2,7 +2,7 @@ _format_version: "3.0"
 
 services:
   - name: flights
-    url: http://host.docker.internal:8081/anything/flights
+    url: http://host.docker.internal:9081/anything/flights
     plugins:
       # B.5 Seguridad: autenticación con Key Auth
       - name: key-auth
@@ -42,10 +42,11 @@ services:
             config:
               allow:
                 - 127.0.0.1
+                - 192.168.65.1
 
   # B.9 Transformación: Request Transformer (OPCIONAL)
   - name: httpbin-service
-    url: http://host.docker.internal:8081
+    url: http://host.docker.internal:9081
     routes:
       - name: httpbin-get
         paths:
@@ -88,7 +89,17 @@ plugins:
   # B.15 Observabilidad Global: SigNoz (OTel)
   - name: opentelemetry
     config:
-      traces_endpoint: http://host.docker.internal:4318/v1/traces
-      logs_endpoint: http://host.docker.internal:4318/v1/logs
+      header_type: w3c
+      traces_endpoint: http://signoz-otel-collector:4318/v1/traces
+      logs_endpoint: http://signoz-otel-collector:4318/v1/logs
+      access_logs_endpoint: http://signoz-otel-collector:4318/v1/logs
+      access_logs:
+        endpoint: http://signoz-otel-collector:4318/v1/logs
+      metrics:
+        enable_request_metrics: true
+        enable_latency_metrics: true
+        enable_bandwidth_metrics: true
+        endpoint: http://signoz-otel-collector:4318/v1/metrics
       resource_attributes:
         service.name: kong-api-gateway
+        deployment.environment: workshop

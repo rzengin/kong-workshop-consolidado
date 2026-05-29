@@ -9,3 +9,8 @@ variable "konnect_addr" {
   description = "Kong Konnect API Address"
   default     = "https://us.api.konghq.com"
 }
+
+variable "participant_prefix" {
+  type        = string
+  description = "Prefijo único para el participante (ej. juanperez, user01)"
+}

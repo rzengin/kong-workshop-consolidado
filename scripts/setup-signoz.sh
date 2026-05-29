@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+cd "$(dirname "$0")/.."
 set -e
 
 # Colores para output
@@ -18,25 +19,20 @@ if ! docker info > /dev/null 2>&1; then
   exit 1
 fi
 
-# 2. Clonar el repositorio de SigNoz si no existe
-if [ ! -d "signoz" ]; then
-  echo -e "${GREEN}[1/3] Clonando el repositorio oficial de SigNoz...${NC}"
-  git clone -b main https://github.com/SigNoz/signoz.git
-else
-  echo -e "${GREEN}[1/3] El repositorio de SigNoz ya existe localmente. Omitiendo clonación...${NC}"
-fi
+# 2. Levantar SigNoz
+echo -e "\n${GREEN}[1/2] Levantando contenedores de SigNoz (esto puede tardar unos minutos la primera vez)...${NC}"
+echo -e "${YELLOW}Limpiando cualquier instalación previa para asegurar un inicio limpio...${NC}"
+cd signoz-deploy/
+docker compose -f docker/docker-compose.yaml down -v
+docker compose -f docker/docker-compose.yaml up -d
 
-# 3. Levantar SigNoz
-echo -e "\n${GREEN}[2/3] Levantando contenedores de SigNoz (esto puede tardar unos minutos la primera vez)...${NC}"
-cd signoz/deploy/
-docker compose -f docker/clickhouse-setup/docker-compose.yaml up -d
-
-echo -e "\n${GREEN}[3/3] Verificando estado...${NC}"
+echo -e "\n${GREEN}[2/2] Verificando estado...${NC}"
 echo -e "Esperando a que el frontend inicie correctamente..."
 sleep 5
 
 echo -e "\n${GREEN}======================================================${NC}"
 echo -e "${GREEN} ¡SigNoz está corriendo!${NC}"
-echo -e " UI (Dashboard): http://localhost:3301"
+echo -e " UI (Dashboard): http://localhost:8080"
+echo -e " (Nota: En el primer ingreso a la UI se te pedirá crear una cuenta de administrador local)"
 echo -e " OTLP Endpoint (Traces/Logs): http://localhost:4318 (HTTP)"
 echo -e "${GREEN}======================================================${NC}\n"
